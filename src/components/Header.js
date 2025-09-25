@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useCart } from '../context/CartContext';
+import Cart from './Cart';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { getCartItemsCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,6 +94,24 @@ const Header = () => {
             >
               Log in
             </motion.button>
+            
+            {/* Cart Icon */}
+            <motion.button
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-white hover:text-orange-400 transition-colors duration-200 p-2"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              {getCartItemsCount() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {getCartItemsCount()}
+                </span>
+              )}
+            </motion.button>
+            
             <motion.button
               className="bg-spotify-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-500 transition-all duration-200 shadow-lg hover:shadow-green-500/25"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(29, 185, 84, 0.3)" }}
@@ -143,6 +165,20 @@ const Header = () => {
                 >
                   Log in
                 </motion.button>
+                
+                {/* Mobile Cart Button */}
+                <motion.button
+                  onClick={() => setIsCartOpen(true)}
+                  className="text-white hover:text-orange-400 transition-colors duration-200 text-left flex items-center"
+                  variants={itemVariants}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  Cart ({getCartItemsCount()})
+                </motion.button>
+                
                 <motion.button
                   className="bg-spotify-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-500 transition-all duration-200 w-fit"
                   variants={itemVariants}
@@ -156,6 +192,9 @@ const Header = () => {
           </motion.div>
         )}
       </nav>
+      
+      {/* Cart Sidebar */}
+      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </motion.header>
   );
 };

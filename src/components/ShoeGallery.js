@@ -1,11 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { useCart } from '../context/CartContext';
+import ProductModal from './ProductModal';
 
 const ShoeGallery = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addToCart, loading } = useCart();
+
+  const handleProductClick = (shoe) => {
+    setSelectedProduct(shoe);
+    setIsModalOpen(true);
+  };
+
+  const handleQuickAdd = async (shoe, e) => {
+    e.stopPropagation();
+    
+    const cartItem = {
+      ...shoe,
+      size: '9', // Default size for quick add
+      quantity: 1,
+      id: `${shoe.name}-9-${Date.now()}`
+    };
+
+    await addToCart(cartItem);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -112,6 +135,7 @@ const ShoeGallery = () => {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          id="products"
         >
           {shoes.map((shoe, index) => (
             <motion.div
@@ -121,7 +145,8 @@ const ShoeGallery = () => {
                 scale: 1.05,
                 y: -10
               }}
-              className="group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden border border-gray-700 hover:border-orange-500/50 transition-all duration-300"
+              onClick={() => handleProductClick(shoe)}
+              className="group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden border border-gray-700 hover:border-orange-500/50 transition-all duration-300 cursor-pointer"
             >
               <div className="relative h-64 overflow-hidden">
                 <img 
@@ -158,11 +183,13 @@ const ShoeGallery = () => {
                 
                 <div className="flex items-center justify-between">
                   <motion.button
-                    className="bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors duration-200"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => handleQuickAdd(shoe, e)}
+                    disabled={loading}
+                    className="bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    whileHover={{ scale: loading ? 1 : 1.05 }}
+                    whileTap={{ scale: loading ? 1 : 0.95 }}
                   >
-                    Add to Cart
+                    {loading ? 'Adding...' : 'Quick Add'}
                   </motion.button>
                   
                   <motion.button
@@ -201,6 +228,16 @@ const ShoeGallery = () => {
             View All Collection
           </motion.button>
         </motion.div>
+        
+        {/* Product Modal */}
+        <ProductModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedProduct(null);
+          }}
+        />
       </div>
     </section>
   );

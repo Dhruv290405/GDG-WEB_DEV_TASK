@@ -1,5 +1,6 @@
 import React from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
+import { CartProvider } from './context/CartContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -12,15 +13,17 @@ import './App.css';
 function App() {
   return (
     <ErrorBoundary>
-      <div className="App">
-        <Header />
-        <Hero />
-        <Features />
-        <ShoeGallery />
-        <Pricing />
-        <About />
-        <Footer />
-      </div>
+      <CartProvider>
+        <div className="App">
+          <Header />
+          <Hero />
+          <Features />
+          <ShoeGallery />
+          <Pricing />
+          <About />
+          <Footer />
+        </div>
+      </CartProvider>
     </ErrorBoundary>
   );
 }

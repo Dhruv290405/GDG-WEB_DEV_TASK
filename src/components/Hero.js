@@ -132,6 +132,12 @@ const Hero = () => {
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
               <motion.button
+                onClick={() => {
+                  const element = document.getElementById('products');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className="bg-orange-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-orange-600 transition-all duration-200 shadow-lg hover:shadow-orange-500/25"
                 whileHover={{ 
                   scale: 1.05,
