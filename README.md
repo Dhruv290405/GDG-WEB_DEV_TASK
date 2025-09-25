@@ -2,7 +2,7 @@
 
 A stunning, modern Nike brand landing page built with React.js, featuring dynamic animations, interactive components, and Nike's iconic design language. This project showcases athletic excellence through cutting-edge web technology.
 
-![SoundWave Landing Page](https://via.placeholder.com/800x400/1DB954/FFFFFF?text=SoundWave+Landing+Page)
+![SoundWave Landing Page](https://via.placeholder.com/800x400/1DB954/FFFFFF)
 
 ## ✨ Features
 
