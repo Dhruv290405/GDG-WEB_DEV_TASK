@@ -1,0 +1,12 @@
+{
+  "services": [
+    {
+      "type": "static_site",
+      "name": "nike-landing-gdg",
+      "repo": "https://github.com/Dhruv290405/GDG-WEB_DEV_TASK.git",
+      "branch": "main",
+      "buildCommand": "npm install && npm run build",
+      "staticPublishPath": "./build"
+    }
+  ]
+}
