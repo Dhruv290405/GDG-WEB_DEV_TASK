@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import Cart from './Cart';
+import LoginModal from './LoginModal';
+import RegisterModal from './RegisterModal';
+import OnboardingModal from './OnboardingModal';
+import UserProfileModal from './UserProfileModal';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  
   const { getCartItemsCount } = useCart();
+  const { user, isAuthenticated, needsOnboarding } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +28,41 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle onboarding flow
+  useEffect(() => {
+    if (needsOnboarding && isAuthenticated) {
+      setIsOnboardingModalOpen(true);
+    }
+  }, [needsOnboarding, isAuthenticated]);
+
+  const handleLoginClick = () => {
+    if (isAuthenticated) {
+      setIsProfileModalOpen(true);
+    } else {
+      setIsLoginModalOpen(true);
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleGetStartedClick = () => {
+    if (isAuthenticated) {
+      setIsOnboardingModalOpen(true);
+    } else {
+      setIsRegisterModalOpen(true);
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  const switchToRegister = () => {
+    setIsLoginModalOpen(false);
+    setIsRegisterModalOpen(true);
+  };
+
+  const switchToLogin = () => {
+    setIsRegisterModalOpen(false);
+    setIsLoginModalOpen(true);
+  };
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -85,15 +131,32 @@ const Header = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
+          {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <motion.button
-              className="text-white hover:text-spotify-green transition-colors duration-200"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Log in
-            </motion.button>
+            {isAuthenticated ? (
+              <motion.button
+                onClick={handleLoginClick}
+                className="flex items-center space-x-2 text-white hover:text-spotify-green transition-colors duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <img
+                  src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || user?.email || 'User')}&background=f97316&color=fff&size=32`}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border-2 border-white/20"
+                />
+                <span className="font-medium">{user?.firstName || user?.name?.split(' ')[0] || 'User'}</span>
+              </motion.button>
+            ) : (
+              <motion.button
+                onClick={handleLoginClick}
+                className="text-white hover:text-spotify-green transition-colors duration-200 font-medium"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Log In
+              </motion.button>
+            )}
             
             {/* Cart Icon */}
             <motion.button
@@ -113,11 +176,12 @@ const Header = () => {
             </motion.button>
             
             <motion.button
+              onClick={handleGetStartedClick}
               className="bg-spotify-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-500 transition-all duration-200 shadow-lg hover:shadow-green-500/25"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(29, 185, 84, 0.3)" }}
               whileTap={{ scale: 0.95 }}
             >
-              Get Started
+              {isAuthenticated ? 'Personalize' : 'Get Started'}
             </motion.button>
           </div>
 
@@ -158,13 +222,30 @@ const Header = () => {
                 </motion.button>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-700">
-                <motion.button
-                  className="text-white hover:text-spotify-green transition-colors duration-200 text-left"
-                  variants={itemVariants}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Log in
-                </motion.button>
+                {isAuthenticated ? (
+                  <motion.button
+                    onClick={handleLoginClick}
+                    className="flex items-center space-x-2 text-white hover:text-spotify-green transition-colors duration-200 text-left"
+                    variants={itemVariants}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <img
+                      src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || user?.email || 'User')}&background=f97316&color=fff&size=32`}
+                      alt="Profile"
+                      className="w-6 h-6 rounded-full border border-white/20"
+                    />
+                    <span>{user?.firstName || user?.name?.split(' ')[0] || 'Profile'}</span>
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    onClick={handleLoginClick}
+                    className="text-white hover:text-spotify-green transition-colors duration-200 text-left"
+                    variants={itemVariants}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Log In
+                  </motion.button>
+                )}
                 
                 {/* Mobile Cart Button */}
                 <motion.button
@@ -180,12 +261,13 @@ const Header = () => {
                 </motion.button>
                 
                 <motion.button
+                  onClick={handleGetStartedClick}
                   className="bg-spotify-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-500 transition-all duration-200 w-fit"
                   variants={itemVariants}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Get Started
+                  {isAuthenticated ? 'Personalize' : 'Get Started'}
                 </motion.button>
               </div>
             </div>
@@ -195,6 +277,29 @@ const Header = () => {
       
       {/* Cart Sidebar */}
       <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      
+      {/* Authentication Modals */}
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)}
+        switchToRegister={switchToRegister}
+      />
+      
+      <RegisterModal 
+        isOpen={isRegisterModalOpen} 
+        onClose={() => setIsRegisterModalOpen(false)}
+        switchToLogin={switchToLogin}
+      />
+      
+      <OnboardingModal 
+        isOpen={isOnboardingModalOpen} 
+        onClose={() => setIsOnboardingModalOpen(false)}
+      />
+      
+      <UserProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </motion.header>
   );
 };
