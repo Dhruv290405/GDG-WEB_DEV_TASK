@@ -2,7 +2,7 @@
   "name": "brand-landing",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dhruv290405.github.io/GDG-WEB_DEV_TASK",
+  "homepage": "./",
   "dependencies": {
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
